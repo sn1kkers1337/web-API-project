@@ -147,7 +147,6 @@ def login():
     form = LoginForm()
     message = ""
     if form.validate_on_submit():
-        # Ищем пользователя либо по email, либо по username
         user = User.query.filter(
             (User.email == form.login_id.data) | (User.username == form.login_id.data)
         ).first()
@@ -319,19 +318,15 @@ def export_json():
 @login_required
 def export_csv():
     items = Item.query.filter_by(user_id=current_user.id).all()
-
-    # Используем StringIO для записи CSV в память
     output = io.StringIO()
-    # Указываем заголовки (колонки)
+    
     fieldnames = ['id', 'title', 'item_type', 'author', 'genre', 'status', 'rating', 'notes']
     writer = csv.DictWriter(output, fieldnames=fieldnames)
 
     writer.writeheader()
     for item in items:
-        # dict_row = item.to_dict() — это вернет словарь
         writer.writerow(item.to_dict())
 
-    # Создаем ответ с правильными заголовками для скачивания
     response = make_response(output.getvalue())
     response.headers["Content-Disposition"] = "attachment; filename=my_collection.csv"
     response.headers["Content-Type"] = "text/csv; charset=utf-8"
@@ -344,7 +339,6 @@ def get_stats():
     items = Item.query.filter_by(user_id=current_user.id).all()
     total = len(items)
 
-    # Распределение по типам и статусам
     by_type = {"book": 0, "game": 0, "movie": 0, "other": 0}
     by_status = {"not_started": 0, "in_progress": 0, "completed": 0}
     total_rating = 0
@@ -430,22 +424,19 @@ def item_detail(item_id):
 @login_required
 def manage_items():
     if request.method == 'GET':
-        # --- ФУНКЦИЯ 4: ПРОДВИНУТАЯ ФИЛЬТРАЦИЯ И СОРТИРОВКА ---
+        # --- ПРОДВИНУТАЯ ФИЛЬТРАЦИЯ И СОРТИРОВКА ---
         sort_by = request.args.get('sort', 'id_desc')
         filter_type = request.args.get('type', 'all')
         search_query = request.args.get('q', '').lower()
 
         query = Item.query.filter_by(user_id=current_user.id)
 
-        # Фильтрация по типу
         if filter_type != 'all':
             query = query.filter_by(item_type=filter_type)
 
-        # Поиск (по названию или автору)
         if search_query:
             query = query.filter((Item.title.ilike(f'%{search_query}%')) | (Item.author.ilike(f'%{search_query}%')))
 
-        # Сортировка
         if sort_by == 'rating_desc':
             query = query.order_by(Item.rating.desc())
         elif sort_by == 'rating_asc':
