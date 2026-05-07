@@ -157,7 +157,6 @@
                 });
             }
 
-            // ФУНКЦИЯ 4: ЛОГИКА СОРТИРОВКИ И ПОИСКА
             function renderTable() {
                 const search = document.getElementById('search').value.toLowerCase();
                 const type = document.getElementById('filterType').value;
@@ -193,7 +192,6 @@
                 });
             }
 
-            // ФУНКЦИЯ 1: ОТКРЫТИЕ И СОХРАНЕНИЕ
             function openEdit(id) {
                 const item = allItems.find(i => i.id === id);
                 document.getElementById('edit_id').value = item.id;
@@ -220,7 +218,6 @@
                 }).then(() => { $('#editModal').modal('hide'); loadItems(); });
             };
 
-            // ФУНКЦИЯ 3: ИМПОРТ
             function importCollection(input) {
                 const formData = new FormData();
                 formData.append('file', input.files[0]);
@@ -229,7 +226,6 @@
                     .then(d => { alert('Импорт завершен'); loadItems(); });
             }
 
-            // ФУНКЦИЯ 5: ГРАФИК
             function updateStats() {
                 fetch('/api/stats').then(r => r.json()).then(stats => {
                     document.getElementById('statsDiv').innerHTML = `
